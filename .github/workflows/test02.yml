@@ -1,0 +1,21 @@
+name: PR approval check
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  pr-approval-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Check approvals
+        run: |
+          APPROVALS=$(jq -r '.pull_request.reviews | map(select(.state == "APPROVED")) | length' $GITHUB_EVENT_PATH)
+          echo "Number of approvals: $APPROVALS"
+
+      - name: Say hello
+        if: ${{ env.APPROVALS >= 2 }}
+        run: echo "Hello World"
